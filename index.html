@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anki-style Trainer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="bg-white p-6 rounded-xl shadow-xl text-center w-full max-w-xl">
+    <div id="prompt" class="text-xl font-semibold mb-4"></div>
+    <button id="showBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Show Answer</button>
+    <div id="answer" class="text-lg font-medium my-4 hidden"></div>
+
+    <div id="responseBtns" class="hidden">
+        <button class="bg-red-500 text-white px-3 py-2 rounded mx-1" id="wrongBtn">Didn't Remember</button>
+        <button class="bg-yellow-500 text-white px-3 py-2 rounded mx-1" id="hardBtn">Hard</button>
+        <button class="bg-green-500 text-white px-3 py-2 rounded mx-1" id="easyBtn">Easy</button>
+    </div>
+</div>
+
+<script>
+(() => {
+    const rawData = `Aufmarsch (nienburg): emi 3/7,5 Jermo 3/6,5
+Aufmarsch musikbeginn: emi 2/-4 Jermo 5,5/-1
+Aufmarsch ronde auf 6: 3/1,5
+Erstes Viertel gong: 3/5
+Erstes Viertel paso nach 2. swivel: 3/-1
+Erstes Viertel paso pose auf 5: 3/-4
+Erstes Viertel Paso nach ronde: 3/-3
+Erstes Viertel paso nach seitlichen schritten: 2/0 [hinter Elmar]
+Erstes Viertel paso/chacha: 1,5/1
+Erstes Viertel chacha 1: 0/1
+Erstes Viertel chacha spotturn: -1,5/1
+Erstes Viertel chcha timing 3 vor locks: -1,5/1,5
+Erstes Viertel anfang sambarollen: -1,5/5,5
+Erstes Viertel sambarollen ZB: 1/3 [hinter Patrick]
+Erstes Viertel Sambarollen ende: 5/5,5
+Erstes Viertel samba damenpose: 3/-2
+Erstes Viertel Rumba gezogen: 3/0
+Zweites Viertel Jive getrennt: emi 5/-3 jermo 0/2
+Zweites Viertel Jive ende: -1/3
+Zweites Viertel Chacha locks vor: 0,5/0,5
+Zweites Viertel Chacha ZB vor boxen: -0,5/1,5
+Zweites Viertel Chacha ZWB boxen: -3/6
+Zweites Viertel chacha endbild: -4/7,5 [hinter Jasper und Niklas]
+Zweites Viertel paso 1. achter: 0/7
+Zweites Viertel paso ende 2. achter: 4/6,5
+Zweites Viertel Paso anfang UA drehungen: 4/3
+Zweites Viertel Ende UA drehungen: 0/3
+Drittes Viertel Neuer Paso: 1/0
+Drittes Viertel Paso damenpose auf 5: 0/2,5
+Drittes Viertel samba roundabout: 4,5/0 [hinter Elmar]
+Drittes Viertel samba skip: 5/3
+Drittes Viertel Ende samba/anfang jive: 6/7,5
+Drittes Viertel ZWB jive auf 4: 4/2 [auf lücke hinter elmar und patrick]
+Drittes Viertel jive ende: 4/1
+Letztes Viertel chacha heat: 2/-3,5 [hinter Elmar]
+Letztes Viertel chacha doppelcheck: 2/-4,5 [hinter Elmar]
+Letztes Viertel chacha STB: 3/0,5
+Letztes Viertel chacha turn: 5/2
+Letztes Viertel samba anfang: 5/3,5 [auf lücke hinter elmar und patrick]
+Letztes Viertel samba zb auf 6: 2/-1
+Letztes Viertel samba check: 0/-3
+Letztes Viertel ende gong: 3/-3
+Ausmarsch herrenreihe: emi 3/-3 jermo 6/0
+Ausmarsch dame neben herr: emi 7/0 jermo 6/0
+Ausmarsch endbild: emi 1/-5,5 jermo 1,5/-5,5`;
+
+    let data = rawData.split('\n').map(line => {
+        const [prompt, answer] = line.split(':');
+        return { prompt: prompt.trim(), answer: answer.trim(), score: 0 };
+    });
+
+    let current;
+
+    function selectNext() {
+        data.sort((a, b) => a.score - b.score + Math.random());
+        current = data[0];
+        document.getElementById('prompt').textContent = current.prompt;
+        document.getElementById('answer').textContent = current.answer;
+        document.getElementById('answer').classList.add('hidden');
+        document.getElementById('responseBtns').classList.add('hidden');
+        document.getElementById('showBtn').classList.remove('hidden');
+    }
+
+    function mark(difficulty) {
+        if (difficulty === 'wrong') current.score -= 2;
+        else if (difficulty === 'hard') current.score -= 1;
+        else current.score += 2;
+        selectNext();
+    }
+
+    document.getElementById('showBtn').onclick = () => {
+        document.getElementById('answer').classList.remove('hidden');
+        document.getElementById('responseBtns').classList.remove('hidden');
+        document.getElementById('showBtn').classList.add('hidden');
+    };
+
+    document.getElementById('wrongBtn').onclick = () => mark('wrong');
+    document.getElementById('hardBtn').onclick = () => mark('hard');
+    document.getElementById('easyBtn').onclick = () => mark('easy');
+
+    selectNext();
+})();
+</script>
+</body>
+</html>
